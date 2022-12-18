@@ -1,19 +1,28 @@
 import { useQuery } from '@tanstack/react-query';
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
+import ConfirmationModal from '../../Shared/ConfirmationModal/ConfirmationModal';
+import Loading from '../../Shared/Loading/Loading';
+
 
 const AllUsers = () => {
-  const { data: users = [], refetch } = useQuery({
+  // const [deletingUser, setDeletingUser] = useState(null);
+
+  // const closeModal = () => {
+ 
+  //   setDeletingUser(null);
+  // }
+  const { data: users = [],isLoading, refetch } = useQuery({
     queryKey: ['users'],
     queryFn: async () => {
-      const res = await fetch('https://doctorchai-bd-server-side.vercel.app/users');
+      const res = await fetch('http://localhost:5000/users');
       const data = await res.json();
       return data;
     }
   });
 
   const handleMakeAdmin = id => {
-    fetch(`https://doctorchai-bd-server-side.vercel.app/users/admin/${id}`, {
+    fetch(`http://localhost:5000/users/admin/${id}`, {
       method: 'PUT',
       headers: {
         authorization: `bearer ${localStorage.getItem('accessToken')}`
@@ -27,6 +36,25 @@ const AllUsers = () => {
         }
       })
   }
+  const handleDeleteUser = id => {
+    
+    fetch(`http://localhost:5000/users/${id}`, {
+      method: 'DELETE',
+      headers: {
+        authorization: `bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.deletedCount > 0) {
+          refetch();
+          toast.success(`Deleted successfully`)
+        }
+      })
+  }
+  if (isLoading) {
+    return <Loading></Loading>
+}
 
   return (
     <div>
@@ -49,13 +77,25 @@ const AllUsers = () => {
                 <td>{user.name}</td>
                 <td>{user.email}</td>
                 <td>{user?.role !== 'admin' ? <button onClick={() => handleMakeAdmin(user._id)} className='btn btn-xs btn-primary'>Make Admin</button> : <p className='text-green-500'>Admin</p>}</td>
-                <td><button className='btn btn-xs btn-danger'>Delete</button></td>
+                <td><button onClick={() => handleDeleteUser(user._id)} htmlFor="confirmation-modal" className="btn btn-xs btn-error">Delete</button></td>
               </tr>)
             }
 
           </tbody>
         </table>
+
       </div>
+      {/* {
+        deletingUser && <ConfirmationModal
+          title={`Are you sure you want to delete?`}
+          message={`If you delete ${deletingUser.name}. It cannot be undone.`}
+          successAction={handleDeleteUser}
+          successButtonName="Delete"
+          modalData={deletingUser}
+          closeModal={closeModal}
+        >
+        </ConfirmationModal>
+      } */}
     </div>
   );
 };
