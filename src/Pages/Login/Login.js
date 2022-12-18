@@ -41,8 +41,8 @@ const Login = () => {
             .then(result => {
                 const user = result.user;
                 saveUser(user.displayName, user.email);
-                navigate('/')
                 toast.success('Successfully You entered.')
+                navigate('/')
 
             })
             .catch(error => {

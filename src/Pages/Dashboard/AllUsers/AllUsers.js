@@ -38,7 +38,7 @@ const AllUsers = () => {
               <th></th>
               <th>Name</th>
               <th>Email</th>
-              <th>Admin</th>
+              <th>Role</th>
               <th>Delete</th>
             </tr>
           </thead>
@@ -48,7 +48,7 @@ const AllUsers = () => {
                 <th>{i + 1}</th>
                 <td>{user.name}</td>
                 <td>{user.email}</td>
-                <td>{user?.role !== 'admin' && <button onClick={() => handleMakeAdmin(user._id)} className='btn btn-xs btn-primary'>Make Admin</button>}</td>
+                <td>{user?.role !== 'admin' ? <button onClick={() => handleMakeAdmin(user._id)} className='btn btn-xs btn-primary'>Make Admin</button> : <p className='text-green-500'>Admin</p>}</td>
                 <td><button className='btn btn-xs btn-danger'>Delete</button></td>
               </tr>)
             }
